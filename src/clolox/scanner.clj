@@ -21,18 +21,20 @@
          text (subs source start current)]
      (update sc :scanner/tokens conj (token/token token-type text literal line)))))
 
-(defn current-char
+(defn peek
   [sc]
-  (.charAt (:scanner/source sc) (:scanner/current sc)))
+  (if (at-end? sc)
+    \u0000
+    (.charAt (:scanner/source sc) (:scanner/current sc))))
 
 (defn advance
   [sc]
-  [(current-char sc) (update sc :scanner/current inc)])
+  [(peek sc) (update sc :scanner/current inc)])
 
 (defn next-token-matches?
   [sc c]
   (and (not (at-end? sc))
-       (= (current-char sc)) c))
+       (= (peek sc)) c))
 
 ;; REVIEW: can I come up with a better name for this function?
 (defn advance-if-matches
@@ -60,6 +62,12 @@
       \= (advance-if-matches s \= ::token/equal-equal ::token/equal)
       \< (advance-if-matches s \= ::token/less-equal ::token/less)
       \> (advance-if-matches s \= ::token/greater-equal ::token/greater)
+      \/ (if (next-token-matches? s \/)
+           (loop [s s]
+             (if (and (not (at-end? s)) (not= \n (peek s)))
+               (recur (advance s))
+               s))
+           (add-token s ::token/slash))
       (clolox/error
        (:scanner/line s)
        (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t)))))

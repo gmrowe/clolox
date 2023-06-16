@@ -60,4 +60,10 @@
     (testing "greater"
       (assert-first-token-matches ">" ":clolox.token/greater > null"))
     (testing "greater-equal"
-      (assert-first-token-matches ">=" ":clolox.token/greater-equal >= null"))))
+      (assert-first-token-matches ">=" ":clolox.token/greater-equal >= null")))
+
+  (testing "a slash can be division or start of a comment"
+    (testing "division"
+      (assert-first-token-matches "/" ":clolox.token/slash / null"))
+    #_(testing "a comment"
+      (assert-first-token-matches "// This is a comment\n" ":clolox.token/eof  null"))))
