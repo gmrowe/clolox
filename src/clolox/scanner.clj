@@ -49,6 +49,24 @@
       s
       (recur (second (advance s))))))
 
+(defn scan-string
+  [sc]
+  (loop [{:scanner/keys [line source start current] :as sc} sc]
+    (cond
+      (at-end? sc)
+      (do (clolox/error line "Unterminated string") sc)
+
+      (= (peek-char sc) \")
+      (add-token
+       (second (advance sc))
+       ::token/string
+       (subs source (inc start) current))
+      
+      (= (peek-char sc) \newline)
+      (recur (second (advance (update sc :scanner/line inc))))
+
+      :else (recur (second (advance sc))))))
+
 (defn scan-token
   [sc]
   (let [[t s] (advance sc)]
@@ -72,6 +90,7 @@
            (add-token s ::token/slash))
       (\tab \space \return) s
       \newline (update s :scanner/line inc)
+      \" (scan-string s)
       (clolox/error
        (:scanner/line s)
        (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t)))))
@@ -84,3 +103,8 @@
       (if (at-end? s1)
         (:scanner/tokens (add-token s1 ::token/eof))
         (recur (scan-token s1))))))
+
+
+(let [s "\"Line 1\nLine 2\""]
+  (token/as-str (first (scan-tokens (scanner s)))))
+

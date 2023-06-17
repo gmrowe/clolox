@@ -76,5 +76,11 @@
   (testing "tabs are skipped"
     (assert-first-token-matches "\t\t\t" ":clolox.token/eof  null 1"))
   (testing "returns are skipped"
-    (assert-first-token-matches "\r\r\r" ":clolox.token/eof  null 1")))
+    (assert-first-token-matches "\r\r\r" ":clolox.token/eof  null 1"))
+
+  ;; Strings
+  (testing "A quote starts a string"
+    (assert-first-token-matches
+     "\"This is a string\""
+     ":clolox.token/string \"This is a string\" This is a string 1")))
 
