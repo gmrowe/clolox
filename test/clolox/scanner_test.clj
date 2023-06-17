@@ -60,7 +60,7 @@
     (testing "greater-equal"
       (assert-first-token-matches ">=" ":clolox.token/greater-equal >= null 1")))
 
-  ;; One character or variable length token
+  ;; A slash starts division or a comment
   (testing "a slash can be division or start of a comment:"
     (testing "division"
       (assert-first-token-matches "/" ":clolox.token/slash / null 1"))
@@ -82,5 +82,15 @@
   (testing "A quote starts a string"
     (assert-first-token-matches
      "\"This is a string\""
-     ":clolox.token/string \"This is a string\" This is a string 1")))
+     ":clolox.token/string \"This is a string\" This is a string 1"))
+  (testing "Strings can be mulitline"
+    (assert-first-token-matches
+     "\"Line 1\nLine 2\""
+     ":clolox.token/string \"Line 1\nLine 2\" Line 1\nLine 2 2"))
+
+  ;; Numbers
+  (testing "A number without a decimal"
+    (assert-first-token-matches "123" ":clolox.token/number 123 123.0 1"))
+  (testing "A number with a decimal"
+    (assert-first-token-matches "123.456" ":clolox.token/number 123.456 123.456 1")))
 

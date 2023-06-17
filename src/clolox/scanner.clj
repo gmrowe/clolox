@@ -27,6 +27,12 @@
     \u0000
     (.charAt (:scanner/source sc) (:scanner/current sc))))
 
+(defn peek-next-char
+  [sc]
+  (if (at-end? sc)
+    \u0000
+    (peek-char (second (advance sc)))))
+
 (defn advance
   [sc]
   [(peek-char sc) (update sc :scanner/current inc)])
@@ -59,7 +65,10 @@
 
       ;; We reach the closing quotation marks
       (= (peek-char sc) \")
-      (add-token (second (advance sc)) ::token/string (subs source (inc start) current))
+      (add-token
+       (second (advance sc))
+       ::token/string
+       (subs source (inc start) current))
 
       ;; We reach an internal newline in the string
       (= (peek-char sc) \newline)
@@ -67,6 +76,36 @@
 
       ;; Nothing... we keep on parsing
       :else (recur (second (advance sc))))))
+
+(defn scan-number
+  [sc]
+  (loop [{:scanner/keys [source start current] :as sc} sc
+         fractional? false]
+    (cond
+      ;; We found another digit.. continue parsing
+      (Character/isDigit (peek-char sc))
+      (recur (second (advance sc)) fractional?)
+
+      ;; We found a decimal point, if this is the first decimal we
+      ;; have seen (not fractional?) then we consume it and continue to parse
+      ;; otherwise we fall through and parse what we have thus far
+      (and (= \. (peek-char sc))
+           (not fractional?)
+           (Character/isDigit (peek-next-char sc)))
+      (recur (second (advance sc)) true)
+
+      ;; We are at neither a digit, nor a decimal point. Lets try to parse
+      ;; what we have so far
+      :else (add-token sc ::token/number (Double/parseDouble (subs source start current))))))
+
+(defn lit-num-or-error
+  [t sc]
+  (if (Character/isDigit t)
+    (scan-number sc)
+    (do (clolox/error
+         (:scanner/line sc)
+         (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t))
+        sc)))
 
 (defn scan-token
   [sc]
@@ -92,9 +131,8 @@
       (\tab \space \return) s
       \newline (update s :scanner/line inc)
       \" (scan-string s)
-      (clolox/error
-       (:scanner/line s)
-       (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t)))))
+      ;; Default (fall through)
+      (lit-num-or-error t s))))
 
 (defn scan-tokens
   [sc]
@@ -104,5 +142,4 @@
       (if (at-end? s1)
         (:scanner/tokens (add-token s1 ::token/eof))
         (recur (scan-token s1))))))
-
 
