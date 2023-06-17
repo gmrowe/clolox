@@ -21,7 +21,7 @@
          text (subs source start current)]
      (update sc :scanner/tokens conj (token/token token-type text literal line)))))
 
-(defn peek
+(defn peek-char
   [sc]
   (if (at-end? sc)
     \u0000
@@ -29,20 +29,25 @@
 
 (defn advance
   [sc]
-  [(peek sc) (update sc :scanner/current inc)])
+  [(peek-char sc) (update sc :scanner/current inc)])
 
 (defn next-token-matches?
   [sc c]
-  (and (not (at-end? sc))
-       (= (peek sc)) c))
+  (and (not (at-end? sc)) (= (peek-char sc) c)))
 
 ;; REVIEW: can I come up with a better name for this function?
 (defn advance-if-matches
-  [s0 expected tok-a tok-b]
-  (if (next-token-matches? s0 expected)
-    (let [[_ s1] (advance s0)]
-      (add-token s1 tok-a))
-    (add-token s0 tok-b)))
+  [sc expected tok-a tok-b]
+  (if (next-token-matches? sc expected)
+    (add-token (second (advance sc)) tok-a)
+    (add-token sc tok-b)))
+
+(defn scan-comment
+  [sc]
+  (loop [s sc]
+    (if (or (at-end? s) (= (peek-char s) \newline))
+      s
+      (recur (second (advance s))))))
 
 (defn scan-token
   [sc]
@@ -63,19 +68,18 @@
       \< (advance-if-matches s \= ::token/less-equal ::token/less)
       \> (advance-if-matches s \= ::token/greater-equal ::token/greater)
       \/ (if (next-token-matches? s \/)
-           (loop [s s]
-             (if (and (not (at-end? s)) (not= \n (peek s)))
-               (recur (advance s))
-               s))
+           (scan-comment s)
            (add-token s ::token/slash))
+      \newline (update s :scanner/line inc)
       (clolox/error
        (:scanner/line s)
        (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t)))))
 
 (defn scan-tokens
   [sc]
-  (loop [sc sc]
-    (if (at-end? sc)
-      (add-token sc ::token/eof)
-      (recur (scan-token (assoc sc :scanner/start (:scanner/current sc)))))))
-
+  (loop [s0 sc]
+    ;; Move the start index to the end of the last token scanned
+    (let [s1 (assoc s0 :scanner/start (:scanner/current s0))]
+      (if (at-end? s1)
+        (add-token s1 ::token/eof)
+        (recur (scan-token s1))))))

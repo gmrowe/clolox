@@ -62,8 +62,15 @@
     (testing "greater-equal"
       (assert-first-token-matches ">=" ":clolox.token/greater-equal >= null")))
 
-  (testing "a slash can be division or start of a comment"
+  (testing "a slash can be division or start of a comment:"
     (testing "division"
       (assert-first-token-matches "/" ":clolox.token/slash / null"))
-    #_(testing "a comment"
-      (assert-first-token-matches "// This is a comment\n" ":clolox.token/eof  null"))))
+    (testing "comment"
+      (testing "text of a comment is discarded by the scanner"
+        (assert-first-token-matches "// This is a comment" ":clolox.token/eof  null"))))
+
+  (testing "the line number is incremented when a newline is encountered"
+    (let [source "\n\n\n"
+          s0 (scanner source)
+          s (scan-tokens s0)]
+      (is (= 4 (:scanner/line s))))))
