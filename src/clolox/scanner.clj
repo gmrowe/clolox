@@ -27,15 +27,15 @@
     \u0000
     (.charAt (:scanner/source sc) (:scanner/current sc))))
 
+(defn advance
+  [sc]
+  [(peek-char sc) (update sc :scanner/current inc)])
+
 (defn peek-next-char
   [sc]
   (if (at-end? sc)
     \u0000
     (peek-char (second (advance sc)))))
-
-(defn advance
-  [sc]
-  [(peek-char sc) (update sc :scanner/current inc)])
 
 (defn next-token-matches?
   [sc c]
