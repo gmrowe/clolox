@@ -1,4 +1,5 @@
 (ns clolox.scanner
+  (:refer-clojure :exclude [peek])
   (:require [clolox.token :as token]
             [clolox.core :as clolox]))
 
@@ -21,7 +22,7 @@
          text (subs source start current)]
      (update sc :scanner/tokens conj (token/token token-type text literal line)))))
 
-(defn peek-char
+(defn peek
   [sc]
   (if (at-end? sc)
     \u0000
@@ -29,17 +30,17 @@
 
 (defn advance
   [sc]
-  [(peek-char sc) (update sc :scanner/current inc)])
+  [(peek sc) (update sc :scanner/current inc)])
 
 (defn peek-next-char
   [sc]
   (if (at-end? sc)
     \u0000
-    (peek-char (second (advance sc)))))
+    (peek (second (advance sc)))))
 
 (defn next-token-matches?
   [sc c]
-  (and (not (at-end? sc)) (= (peek-char sc) c)))
+  (and (not (at-end? sc)) (= (peek sc) c)))
 
 ;; REVIEW: can I come up with a better name for this function?
 (defn advance-if-matches
@@ -51,7 +52,7 @@
 (defn scan-comment
   [sc]
   (loop [s sc]
-    (if (or (at-end? s) (= (peek-char s) \newline))
+    (if (or (at-end? s) (= (peek s) \newline))
       s
       (recur (second (advance s))))))
 
@@ -60,18 +61,19 @@
   (loop [{:scanner/keys [line source start current] :as sc} sc]
     (cond
       ;; We reach the end of the file without terminating the string
+      ;; report an error and continue
       (at-end? sc)
       (do (clolox/error line "Unterminated string") sc)
 
       ;; We reach the closing quotation marks
-      (= (peek-char sc) \")
+      (= (peek sc) \")
       (add-token
        (second (advance sc))
        ::token/string
        (subs source (inc start) current))
 
       ;; We reach an internal newline in the string
-      (= (peek-char sc) \newline)
+      (= (peek sc) \newline)
       (recur (second (advance (update sc :scanner/line inc))))
 
       ;; Nothing... we keep on parsing
@@ -83,29 +85,33 @@
          fractional? false]
     (cond
       ;; We found another digit.. continue parsing
-      (Character/isDigit (peek-char sc))
+      (Character/isDigit (peek sc))
       (recur (second (advance sc)) fractional?)
 
       ;; We found a decimal point, if this is the first decimal we
       ;; have seen (not fractional?) then we consume it and continue to parse
       ;; otherwise we fall through and parse what we have thus far
-      (and (= \. (peek-char sc))
+      (and (= \. (peek sc))
            (not fractional?)
            (Character/isDigit (peek-next-char sc)))
       (recur (second (advance sc)) true)
 
-      ;; We are at neither a digit, nor a decimal point. Lets try to parse
+      ;; We are at neither a digit, nor a first decimal point. Lets try to parse
       ;; what we have so far
       :else (add-token sc ::token/number (Double/parseDouble (subs source start current))))))
 
+(defn scan-identifier
+  [sc]
+  (sc))
+
 (defn lit-num-or-error
   [t sc]
-  (if (Character/isDigit t)
-    (scan-number sc)
-    (do (clolox/error
-         (:scanner/line sc)
-         (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t))
-        sc)))
+  (cond
+    (Character/isDigit t) (scan-number sc)
+    :else  (do (clolox/error
+                (:scanner/line sc)
+                (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t))
+               sc)))
 
 (defn scan-token
   [sc]
