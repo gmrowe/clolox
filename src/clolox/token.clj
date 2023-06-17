@@ -29,4 +29,5 @@
 
 (defn as-str
   [tok]
-  (format "%s %s %s" (:token/type tok) (:token/lexeme tok) (:token/literal tok)))
+  (let [{:token/keys [type lexeme literal line]} tok]
+    (format "%s %s %s %s" type lexeme literal line)))

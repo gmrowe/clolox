@@ -70,6 +70,7 @@
       \/ (if (next-token-matches? s \/)
            (scan-comment s)
            (add-token s ::token/slash))
+      (\tab \space \return) s
       \newline (update s :scanner/line inc)
       (clolox/error
        (:scanner/line s)
@@ -81,5 +82,5 @@
     ;; Move the start index to the end of the last token scanned
     (let [s1 (assoc s0 :scanner/start (:scanner/current s0))]
       (if (at-end? s1)
-        (add-token s1 ::token/eof)
+        (:scanner/tokens (add-token s1 ::token/eof))
         (recur (scan-token s1))))))
