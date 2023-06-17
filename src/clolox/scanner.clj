@@ -53,18 +53,19 @@
   [sc]
   (loop [{:scanner/keys [line source start current] :as sc} sc]
     (cond
+      ;; We reach the end of the file without terminating the string
       (at-end? sc)
       (do (clolox/error line "Unterminated string") sc)
 
+      ;; We reach the closing quotation marks
       (= (peek-char sc) \")
-      (add-token
-       (second (advance sc))
-       ::token/string
-       (subs source (inc start) current))
-      
+      (add-token (second (advance sc)) ::token/string (subs source (inc start) current))
+
+      ;; We reach an internal newline in the string
       (= (peek-char sc) \newline)
       (recur (second (advance (update sc :scanner/line inc))))
 
+      ;; Nothing... we keep on parsing
       :else (recur (second (advance sc))))))
 
 (defn scan-token
@@ -104,7 +105,4 @@
         (:scanner/tokens (add-token s1 ::token/eof))
         (recur (scan-token s1))))))
 
-
-(let [s "\"Line 1\nLine 2\""]
-  (token/as-str (first (scan-tokens (scanner s)))))
 
