@@ -32,11 +32,15 @@
   [sc]
   [(peek sc) (update sc :scanner/current inc)])
 
+(defn qadvance
+  [sc]
+  (second (advance sc)))
+
 (defn peek-next-char
   [sc]
   (if (at-end? sc)
     \u0000
-    (peek (second (advance sc)))))
+    (peek (qadvance sc))))
 
 (defn next-token-matches?
   [sc c]
@@ -46,7 +50,7 @@
 (defn advance-if-matches
   [sc expected tok-a tok-b]
   (if (next-token-matches? sc expected)
-    (add-token (second (advance sc)) tok-a)
+    (add-token (qadvance sc) tok-a)
     (add-token sc tok-b)))
 
 (defn scan-comment
@@ -54,7 +58,7 @@
   (loop [s sc]
     (if (or (at-end? s) (= (peek s) \newline))
       s
-      (recur (second (advance s))))))
+      (recur (qadvance s)))))
 
 (defn scan-string
   [sc]
@@ -68,16 +72,16 @@
       ;; We reach the closing quotation marks
       (= (peek sc) \")
       (add-token
-       (second (advance sc))
+       (qadvance sc)
        ::token/string
        (subs source (inc start) current))
 
       ;; We reach an internal newline in the string
       (= (peek sc) \newline)
-      (recur (second (advance (update sc :scanner/line inc))))
+      (recur (qadvance (update sc :scanner/line inc)))
 
       ;; Nothing... we keep on parsing
-      :else (recur (second (advance sc))))))
+      :else (recur (qadvance sc)))))
 
 (defn scan-number
   [sc]
@@ -86,7 +90,7 @@
     (cond
       ;; We found another digit.. continue parsing
       (Character/isDigit (peek sc))
-      (recur (second (advance sc)) fractional?)
+      (recur (qadvance sc) fractional?)
 
       ;; We found a decimal point, if this is the first decimal we
       ;; have seen (not fractional?) then we consume it and continue to parse
@@ -94,7 +98,7 @@
       (and (= \. (peek sc))
            (not fractional?)
            (Character/isDigit (peek-next-char sc)))
-      (recur (second (advance sc)) true)
+      (recur (qadvance sc) true)
 
       ;; We are at neither a digit, nor a first decimal point. Lets try to parse
       ;; what we have so far
