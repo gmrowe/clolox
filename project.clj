@@ -7,4 +7,5 @@
   :main ^:skip-aot clolox.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
-                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})
+                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
+             :dev {:dependencies [[org.clojure/tools.namespace "1.4.4"]]}})
