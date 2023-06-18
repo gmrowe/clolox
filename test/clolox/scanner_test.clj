@@ -92,5 +92,31 @@
   (testing "A number without a decimal"
     (assert-first-token-matches "123" ":clolox.token/number 123 123.0 1"))
   (testing "A number with a decimal"
-    (assert-first-token-matches "123.456" ":clolox.token/number 123.456 123.456 1")))
+    (assert-first-token-matches "123.456" ":clolox.token/number 123.456 123.456 1"))
 
+  ;; Identifiers
+  (testing "An identifier ending in a numbers"
+    (assert-first-token-matches "val8" ":clolox.token/identifier val8 null 1"))
+  (testing "An identifier beginning in an underscore"
+    (assert-first-token-matches "_val8" ":clolox.token/identifier _val8 null 1"))
+  (testing "An identifief with an interal underscore"
+    (assert-first-token-matches "val_8" ":clolox.token/identifier val_8 null 1"))
+
+  ;;Keywords
+  (testing "Matches keywords"
+    (assert-first-token-matches "and" ":clolox.token/and and null 1")
+    (assert-first-token-matches "class" ":clolox.token/class class null 1")
+    (assert-first-token-matches "else" ":clolox.token/else else null 1")
+    (assert-first-token-matches "false" ":clolox.token/false false null 1")
+    (assert-first-token-matches "for" ":clolox.token/for for null 1")
+    (assert-first-token-matches "fun" ":clolox.token/fun fun null 1")
+    (assert-first-token-matches "if" ":clolox.token/if if null 1")
+    (assert-first-token-matches "nil" ":clolox.token/nil nil null 1")
+    (assert-first-token-matches "or" ":clolox.token/or or null 1")
+    (assert-first-token-matches "print" ":clolox.token/print print null 1")
+    (assert-first-token-matches "return" ":clolox.token/return return null 1")
+    (assert-first-token-matches "super" ":clolox.token/super super null 1")
+    (assert-first-token-matches "this" ":clolox.token/this this null 1")
+    (assert-first-token-matches "true" ":clolox.token/true true null 1")
+    (assert-first-token-matches "var" ":clolox.token/var var null 1")
+    (assert-first-token-matches "while" ":clolox.token/while while null 1")))

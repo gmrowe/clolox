@@ -36,11 +36,12 @@
   [sc]
   (second (advance sc)))
 
-(defn peek-next-char
+(defn peek-next
   [sc]
   (if (at-end? sc)
     \u0000
     (peek (qadvance sc))))
+
 
 (defn next-token-matches?
   [sc c]
@@ -97,21 +98,62 @@
       ;; otherwise we fall through and parse what we have thus far
       (and (= \. (peek sc))
            (not fractional?)
-           (Character/isDigit (peek-next-char sc)))
+           (Character/isDigit (peek-next sc)))
       (recur (qadvance sc) true)
 
       ;; We are at neither a digit, nor a first decimal point. Lets try to parse
       ;; what we have so far
-      :else (add-token sc ::token/number (Double/parseDouble (subs source start current))))))
+      :else (add-token
+             sc
+             ::token/number
+             (Double/parseDouble (subs source start current))))))
+
+(defn lox-identifier-start?
+  [c]
+  (or (= c \_) (Character/isLetter c)))
+
+(defn lox-identifier-part?
+  [c]
+  (or (lox-identifier-start? c) (Character/isDigit c)))
+
+(def keywords
+  {"and" ::token/and
+   "class" ::token/class
+   "else" ::token/else
+   "false" ::token/false
+   "for" ::token/for
+   "fun" ::token/fun
+   "if" ::token/if
+   "nil" ::token/nil
+   "or" ::token/or
+   "print" ::token/print
+   "return" ::token/return
+   "super" ::token/super
+   "this" ::token/this
+   "true" ::token/true
+   "var" ::token/var
+   "while" ::token/while})
+
+(defn add-keyword-or-identifier
+  [sc]
+  (let [{:scanner/keys [source start current] :as sc} sc
+        text (subs source start current)]
+    (if-let [kw (get keywords text)]
+      (add-token sc kw)
+      (add-token sc ::token/identifier))))
 
 (defn scan-identifier
   [sc]
-  (sc))
+  (loop [sc sc]
+    (if (or (at-end? sc) (not (lox-identifier-part? (peek sc))))
+      (add-keyword-or-identifier sc)
+      (recur (qadvance sc)))))
 
-(defn lit-num-or-error
+(defn identifier-or-numeric-literal-or-error
   [t sc]
   (cond
     (Character/isDigit t) (scan-number sc)
+    (lox-identifier-start? t) (scan-identifier sc)
     :else  (do (clolox/error
                 (:scanner/line sc)
                 (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t))
@@ -142,7 +184,7 @@
       \newline (update s :scanner/line inc)
       \" (scan-string s)
       ;; Default (fall through)
-      (lit-num-or-error t s))))
+      (identifier-or-numeric-literal-or-error t s))))
 
 (defn scan-tokens
   [sc]
