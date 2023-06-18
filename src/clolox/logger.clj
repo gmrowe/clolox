@@ -1,6 +1,7 @@
 (ns clolox.logger
   (:require [clojure.string :as str]))
 
+;; REVIEW: Does this atom belong here or in core?
 (def error? (atom false))
 
 (defn report
@@ -14,7 +15,3 @@
 (defn error
   [line-number message]
   (report line-number "" message))
-
-(defn tokenize
-  [source]
-  (str/split source #"\s+"))
