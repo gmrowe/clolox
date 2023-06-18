@@ -1,7 +1,7 @@
 (ns clolox.scanner
   (:refer-clojure :exclude [peek])
   (:require [clolox.token :as token]
-            [clolox.core :as clolox]))
+            [clolox.logger :as logger]))
 
 (defn scanner
   [source]
@@ -68,7 +68,7 @@
       ;; We reach the end of the file without terminating the string
       ;; report an error and continue
       (at-end? sc)
-      (do (clolox/error line "Unterminated string") sc)
+      (do (logger/error line "Unterminated string") sc)
 
       ;; We reach the closing quotation marks
       (= (peek sc) \")
@@ -154,7 +154,7 @@
   (cond
     (Character/isDigit t) (scan-number sc)
     (lox-identifier-start? t) (scan-identifier sc)
-    :else  (do (clolox/error
+    :else  (do (logger/error
                 (:scanner/line sc)
                 (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t))
                sc)))

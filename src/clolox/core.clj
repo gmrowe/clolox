@@ -1,24 +1,12 @@
 (ns clolox.core
-  (:require [clojure.string :as str])
+  (:require [clojure.string :as str]
+            [clolox.logger :as logger]
+            [clolox.scanner :as scanner])
   (:gen-class))
-
-(def error? (atom false))
-
-(defn report
-  [line-number where message]
-  ;; TODO: Implement logging using clojure.tools.logging
-  ;; https://clojure.github.io/tools.logging/
-  (let [err-msg (format "[line %s] Error%s: %s" line-number where message)]
-    (.println *err* err-msg)
-    (reset! error? true)))
-
-(defn error
-  [line-number message]
-  (report line-number "" message))
 
 (defn tokenize
   [source]
-  (str/split source #"\s+"))
+  (scanner/scan-tokens (scanner/scanner source)))
 
 (defn run
   [source]
@@ -33,7 +21,7 @@
   (let [p (java.nio.file.Paths/get path (make-array String 0))
         bytes (java.nio.file.Files/readAllBytes p)]
     (run (String. bytes (java.nio.charset.Charset/defaultCharset)))
-    (when @error?
+    (when @logger/error?
       (System/exit 65))))
 
 (defn run-prompt
@@ -43,13 +31,13 @@
     (flush)
     (when-let [line (read-line)]
       (run (str/trim line))
-      (reset! error? false)
+      (reset! logger/error? false)
       (recur))))
 
 (defn show-usage-and-exit
   []
   (do
-    (println "Usage: clojure -M -m clolox [script]")
+    (println "Usage: clojure -M -m clolox.core [script]")
     (System/exit 64)))
 
 (defn -main
