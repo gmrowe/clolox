@@ -42,7 +42,6 @@
     \u0000
     (peek (qadvance sc))))
 
-
 (defn next-token-matches?
   [sc c]
   (and (not (at-end? sc)) (= (peek sc) c)))

@@ -14,7 +14,6 @@
         footer ["})"]]
     (str/join \newline (concat header kvs tag footer))))
 
-
 (defn write-source-as-string
   [basename types]
   (let [ns [(format "(ns clolox.%s)" basename)]

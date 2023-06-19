@@ -17,7 +17,7 @@
 (deftest scan-tokens-test
   (testing "scan tokens always ends with :eof token"
     (assert-first-token-matches "" ":clolox.token/eof  null 1"))
-  
+
   ;; Single character tokens
   (testing "scan-token can handle single character tokens:"
     (testing "left-paren"
