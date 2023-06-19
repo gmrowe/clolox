@@ -8,4 +8,6 @@
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
-             :dev {:dependencies [[org.clojure/tools.namespace "1.4.4"]]}})
+             :dev {:dependencies [[org.clojure/tools.namespace "1.4.4"]]}
+             :generate-ast {:main tool.generate-ast}}
+  :aliases {"run-generate-ast" ["with-profile" "generate-ast" "run"]})
