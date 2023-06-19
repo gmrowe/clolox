@@ -6,25 +6,25 @@
 
 (def printing-strategy
   {:binary (fn [expr]
-             (parenthesize (get-in expr [:operator-token :token/lexeme])
-                           (:left-expr expr)
-                           (:right-expr expr)))
+             (parenthesize (get-in expr [::expr/operator-token :token/lexeme])
+                           (::expr/left-expr expr)
+                           (::expr/right-expr expr)))
 
    :grouping (fn [expr]
-               (parenthesize "group" (get expr :expr)))
+               (parenthesize "group" (::expr/expr expr)))
 
    :literal (fn [expr]
-              (if-let [v (:value expr)]
+              (if-let [v (::expr/value expr)]
                 (str v)
                 "nil"))
 
    :unary (fn [expr]
-            (parenthesize (get-in expr [:operator-token :token/lexeme])
-                          (:right-expr expr)))})
+            (parenthesize (get-in expr [::expr/operator-token :token/lexeme])
+                          (::expr/right-expr expr)))})
 
 (defn print-expr
   [expr]
-  (let [f (get printing-strategy (:tag expr))]
+  (let [f (get printing-strategy (::expr/tag expr))]
     (f expr)))
 
 (defn parenthesize
@@ -33,8 +33,3 @@
     (str/join (conj (reduce f ["(" fname] exprs) ")"))))
 
 
-(require '[clolox.expr :as expr])
-(require '[clolox.token :as token])
-
-(let [grouping (expr/grouping (expr/literal 123.45))]
-  (print-expr grouping))

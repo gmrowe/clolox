@@ -9,8 +9,8 @@
         header [(format "(defn %s" fname)
                 (format "[%s]" fields)
                 (format "{" fname)]
-        kvs (map (fn [field] (format ":%s %s" field field)) (str/split fields #"\s+"))
-        tag [(format ":tag :%s" fname)]
+        kvs (map (fn [field] (format "::%s %s" field field)) (str/split fields #"\s+"))
+        tag [(format "::tag :%s" fname)]
         footer ["})"]]
     (str/join \newline (concat header kvs tag footer))))
 
