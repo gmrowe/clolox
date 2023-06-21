@@ -1,7 +1,7 @@
 (ns clolox.scanner
   (:refer-clojure :exclude [peek])
-  (:require [clolox.token :as token]
-            [clolox.logger :as logger]))
+  (:require [clolox.logger :as logger]
+            [clolox.token :as token]))
 
 (defn scanner
   [source]
