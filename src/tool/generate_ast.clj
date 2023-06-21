@@ -1,6 +1,6 @@
 (ns tool.generate-ast
   (:require [clojure.java.io :as io]
-            [clojure.pprint :as pprint]
+            [clojure.pprint :as pp]
             [clojure.string :as str])
   (:gen-class))
 
@@ -29,10 +29,10 @@
   (let [ns-header `(ns ~(symbol (ast-namespace basename)))
         defs (map #(define-function basename %) types)]
     (with-out-str
-      (pprint/pprint ns-header)
+      (pp/pprint ns-header)
       (doseq [d defs]
         (println)
-        (pprint/pprint d)))))
+        (pp/pprint d)))))
 
 (defn gen-ast-source
   [path basename types]
