@@ -35,7 +35,7 @@
 
 (defn show-usage-and-exit
   []
-  (println "Usage: clojure -M -m clolox.core [script]")
+  (println "Usage: clojure [script]")
   (System/exit 64))
 
 (defn -main
