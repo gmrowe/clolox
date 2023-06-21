@@ -26,19 +26,17 @@
 
 (defn run-prompt
   []
-  (do
-    (print "> ")
-    (flush)
-    (when-let [line (read-line)]
-      (run (str/trim line))
-      (reset! logger/error? false)
-      (recur))))
+  (print "> ")
+  (flush)
+  (when-let [line (read-line)]
+    (run (str/trim line))
+    (reset! logger/error? false)
+    (recur)))
 
 (defn show-usage-and-exit
   []
-  (do
-    (println "Usage: clojure -M -m clolox.core [script]")
-    (System/exit 64)))
+  (println "Usage: clojure -M -m clolox.core [script]")
+  (System/exit 64))
 
 (defn -main
   [& args]
