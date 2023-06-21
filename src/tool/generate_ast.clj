@@ -49,9 +49,8 @@
 
 (defn print-usage-and-exit
   []
-  (do
-    (println "Usage: lein run-generate-ast <output-directory>")
-    (System/exit 64)))
+  (println "Usage: lein run-generate-ast <output-directory>")
+  (System/exit 64))
 
 (defn -main
   [& args]
