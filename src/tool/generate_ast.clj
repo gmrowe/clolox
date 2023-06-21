@@ -1,24 +1,38 @@
 (ns tool.generate-ast
-  (:require [clojure.string :as str]
-            [clojure.java.io :as io])
+  (:require [clojure.java.io :as io]
+            [clojure.pprint :as pprint]
+            [clojure.string :as str])
   (:gen-class))
 
+(defn ast-namespace
+  [basename]
+  (format "clolox.%s" basename))
+
+(defn make-map
+  [basename fname fields]
+  (let [namespace (ast-namespace basename)
+        add-map-element #(assoc %1 (keyword namespace %2) (symbol %2))]
+    (assoc
+     (reduce add-map-element {} fields)
+     (keyword namespace "tag") (keyword fname))))
+
 (defn define-function
-  [s]
-  (let [[fname fields] (map str/trim (str/split s #":"))
-        header [(format "(defn %s" fname)
-                (format "[%s]" fields)
-                (format "{" fname)]
-        kvs (map (fn [field] (format "::%s %s" field field)) (str/split fields #"\s+"))
-        tag [(format "::tag :%s" fname)]
-        footer ["})"]]
-    (str/join \newline (concat header kvs tag footer))))
+  [basename s]
+  (let [[fname field-str] (map str/trim (str/split s #":"))
+        fields (str/split field-str #"\s+")]
+    `(defn ~(symbol fname)
+       ~(vec (map symbol fields))
+       ~(make-map basename fname fields))))
 
 (defn write-source-as-string
   [basename types]
-  (let [ns [(format "(ns clolox.%s)" basename)]
-        defs (map define-function types)]
-    (str/join \newline (interpose "" (concat ns defs)))))
+  (let [ns-header `(ns ~(symbol (ast-namespace basename)))
+        defs (map #(define-function basename %) types)]
+    (with-out-str
+      (pprint/pprint ns-header)
+      (doseq [d defs]
+        (println)
+        (pprint/pprint d)))))
 
 (defn gen-ast-source
   [path basename types]
