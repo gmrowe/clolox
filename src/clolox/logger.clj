@@ -1,5 +1,4 @@
-(ns clolox.logger
-  (:require [clojure.string :as str]))
+(ns clolox.logger)
 
 ;; REVIEW: Does this atom belong here or in core?
 (def error? (atom false))
