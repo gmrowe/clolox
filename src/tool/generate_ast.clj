@@ -14,7 +14,7 @@
         add-map-element #(assoc %1 (keyword namespace %2) (symbol %2))]
     (assoc
      (reduce add-map-element {} fields)
-     (keyword namespace "tag") (keyword fname))))
+     (keyword namespace "type") (keyword fname))))
 
 (defn define-function
   [basename s]

@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]
             [clolox.expr :as expr]))
 
-(defmulti print-expr ::expr/tag)
+(defmulti print-expr ::expr/type)
 
 (defn parenthesize
   [fname & exprs]
