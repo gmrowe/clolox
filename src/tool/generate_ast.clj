@@ -45,7 +45,8 @@
   ["binary : left-expr operator-token right-expr"
    "grouping: expr"
    "literal: value"
-   "unary: operator-token right-expr"])
+   "unary: operator-token right-expr"
+   "error: message"])
 
 (defn print-usage-and-exit
   []

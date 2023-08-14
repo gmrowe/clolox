@@ -1,4 +1,5 @@
-(ns clolox.logger)
+(ns clolox.logger
+  (:require [clolox.token :as t]))
 
 ;; REVIEW: Does this atom belong here or in core?
 (def error? (atom false))
@@ -12,5 +13,8 @@
     (reset! error? true)))
 
 (defn error
-  [line-number message]
-  (report line-number "" message))
+  [token message]
+  (let [{:token/keys [type line lexeme]} token]
+    (if (= ::t/eof type)
+      (report line  " at end" message)
+      (report line (format " at %s" lexeme) message))))
