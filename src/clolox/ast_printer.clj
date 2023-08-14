@@ -21,9 +21,10 @@
 
 (defmethod print-expr :literal
   [expr]
-  (if-let [v (::expr/value expr)]
-    (str v)
-    "nil"))
+  (let [v (::expr/value expr)]
+    (if (some? v)
+      (str v)
+      "nil")))
 
 (defmethod print-expr :unary
   [expr]
