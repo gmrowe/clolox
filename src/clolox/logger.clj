@@ -12,9 +12,9 @@
     (.println *err* err-msg)
     (reset! error? true)))
 
-(defn error
+(defn error!
   [token message]
   (let [{:token/keys [type line lexeme]} token]
     (if (= ::t/eof type)
       (report line  " at end" message)
-      (report line (format " at %s" lexeme) message))))
+      (report line (format " at '%s'" lexeme) message))))

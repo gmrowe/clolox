@@ -67,7 +67,7 @@
       ;; We reach the end of the file without terminating the string
       ;; report an error and continue
       (at-end? sc)
-      (do (logger/error line "Unterminated string") sc)
+      (do (logger/error! line "Unterminated string") sc)
 
       ;; We reach the closing quotation marks
       (= (peek sc) \")
@@ -153,7 +153,7 @@
   (cond
     (Character/isDigit t) (scan-number sc)
     (lox-identifier-start? t) (scan-identifier sc)
-    :else  (do (logger/error
+    :else  (do (logger/error!
                 (:scanner/line sc)
                 (format "ERROR clolox.scanner/scan-token: unknown token \"%s\"" t))
                sc)))
