@@ -1,6 +1,8 @@
 (ns clolox.core
   (:require [clojure.string :as str]
+            [clolox.ast-printer :as printer]
             [clolox.logger :as logger]
+            [clolox.parser :as parser]
             [clolox.scanner :as scanner])
   (:gen-class))
 
@@ -10,8 +12,11 @@
 
 (defn run
   [source]
-  (let [tokens (tokenize source)]
-    (println (str/join "\n" tokens))))
+  (let [tokens (tokenize source)
+        psr (parser/parser tokens)
+        expr (parser/parse psr)]
+    (when (not @logger/error?)
+      (println (printer/print-expr expr)))))
 
 (defn run-file
   [path]
