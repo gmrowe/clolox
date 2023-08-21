@@ -41,10 +41,11 @@
 
 (defn error
   [token msg]
-  (logger/error token msg)
+  (logger/error! token msg)
   (ex-info
    "ParseError"
-   {:token token
+   {:type ::parse-error
+    :token token
     :msg msg}))
 
 (defn consume
@@ -68,7 +69,8 @@
     (match psr ::t/left-paren)
     (let [[expr p] (expression (advance psr))]
       [(expr/grouping expr)
-       (consume p ::t/right-paren "Expect ')' after expression.")])))
+       (consume p ::t/right-paren "Expect ')' after expression.")])
+    :else (throw (error (peek-token psr) "Expect expression."))))
 
 (defn unary
   [psr]
@@ -124,3 +126,25 @@
 (defn expression
   [psr]
   (equality psr))
+
+
+(defn synchronize-point?
+  [psr]
+  (or (at-end? psr)
+      (= ::t/semicolon (:token/type (previous psr)))
+      (#{::t/class ::t/fun ::t/var ::t/for
+         ::t/if ::t/while ::t/print ::t/return}
+       (peek psr))))
+
+(defn synchronize
+  [psr]
+  (loop [p (advance psr)]
+    (if (synchronize-point? p)
+      p
+      (recur (advance p)))))
+
+(defn parse
+  [psr]
+  (try (first (expression psr))
+       (catch Exception ex
+         nil)))
