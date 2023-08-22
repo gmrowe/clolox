@@ -194,3 +194,7 @@
         (:scanner/tokens (add-token s1 ::token/eof))
         (recur (scan-token s1))))))
 
+(defn tokenize
+  [source]
+  (-> source scanner scan-tokens))
+

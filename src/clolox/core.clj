@@ -6,13 +6,9 @@
             [clolox.scanner :as scanner])
   (:gen-class))
 
-(defn tokenize
-  [source]
-  (scanner/scan-tokens (scanner/scanner source)))
-
 (defn run
   [source]
-  (let [tokens (tokenize source)
+  (let [tokens (scanner/tokenize source)
         psr (parser/parser tokens)
         expr (parser/parse psr)]
     (when (not @logger/error?)
