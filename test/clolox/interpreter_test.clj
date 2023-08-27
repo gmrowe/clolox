@@ -2,8 +2,7 @@
   (:require [clojure.test :refer :all]
             [clolox.interpreter :refer :all]
             [clolox.parser :as parser]
-            [clolox.scanner :as scanner]
-            [clolox.token :as token]))
+            [clolox.scanner :as scanner]))
 
 (defn literal-is
   [lit-expr-string expected-literal]

@@ -145,5 +145,5 @@
 (defn parse
   [psr]
   (try (first (expression psr))
-       (catch Exception ex
+       (catch Exception _
          nil)))

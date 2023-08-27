@@ -1,0 +1,1 @@
+["^ ","~$literal-is",["^ ","~:row",7,"~:col",1,"~:fixed-arities",["~#set",[2]],"~:name","^0","~:ns","~$clolox.interpreter-test","~:top-ns","^7","~:type","~:fn"],"~$evaluate-test",["^ ","^1",16,"^2",1,"^3",["^4",[0]],"^5","^;","^6","^7","^8","^7"],"~:filename","/Users/garrettrowe/dev/clolox/test/clolox/interpreter_test.clj"]

@@ -2,8 +2,7 @@
   (:require [clojure.test :refer :all]
             [clolox.ast-printer :as ast-printer]
             [clolox.parser :refer :all]
-            [clolox.scanner :as scanner]
-            [clolox.token :as token]))
+            [clolox.scanner :as scanner]))
 
 (defn current-lexeme-matches
   [psr expected-lexeme]

@@ -1,6 +1,5 @@
 (ns clolox.interpreter
-  (:require [clojure.string :as str]
-            [clolox.expr :as expr]
+  (:require [clolox.expr :as expr]
             [clolox.token :as token]))
 
 (defmulti visit ::expr/type)

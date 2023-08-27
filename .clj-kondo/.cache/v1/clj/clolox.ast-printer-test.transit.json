@@ -1,0 +1,1 @@
+["^ ","~$print-expr-test",["^ ","~:row",7,"~:col",1,"~:fixed-arities",["~#set",[0]],"~:name","^0","~:ns","~$clolox.ast-printer-test","~:top-ns","^7"],"~:filename","/Users/garrettrowe/dev/clolox/test/clolox/ast_printer_test.clj"]
