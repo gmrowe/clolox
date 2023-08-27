@@ -14,9 +14,8 @@
                     evaluate)]
     (is (= literal expected-literal))))
 
-
 (deftest evaluate-test
-  
+
   (testing "Can evaluate a literal"
     (testing "nil"
       (literal-is "nil" nil))

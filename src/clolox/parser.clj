@@ -127,7 +127,6 @@
   [psr]
   (equality psr))
 
-
 (defn synchronize-point?
   [psr]
   (or (at-end? psr)

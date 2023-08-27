@@ -36,7 +36,7 @@
   (cond
     (and (number? left) (number? right))
     (+ (double left) (double right))
-    
+
     (and (string? left) (string? right))
     (str left right)
 
