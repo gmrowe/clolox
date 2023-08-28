@@ -1,5 +1,5 @@
 (ns clolox.ast-printer-test
-  (:require [clojure.test :refer [is testing]]
+  (:require [clojure.test :refer [deftest is testing]]
             [clolox.ast-printer :refer :all]
             [clolox.expr :as expr]
             [clolox.token :as token]))

@@ -5,7 +5,7 @@
 
 (defn parser
   [tokens]
-  #:parser{:tokens tokens
+  #:parser{:tokens (vec tokens)
            :current 0})
 
 (defn nth-token
@@ -147,3 +147,7 @@
   (try (first (expression psr))
        (catch Exception _
          nil)))
+
+(defn parse-tokens
+  [tokens]
+  (-> tokens parser parse))

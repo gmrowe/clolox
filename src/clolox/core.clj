@@ -1,6 +1,7 @@
 (ns clolox.core
   (:require [clojure.string :as str]
             [clolox.ast-printer :as printer]
+            [clolox.interpreter :as interpreter]
             [clolox.logger :as logger]
             [clolox.parser :as parser]
             [clolox.scanner :as scanner])
@@ -12,18 +13,19 @@
         psr (parser/parser tokens)
         expr (parser/parse psr)]
     (when (not @logger/error?)
-      (println (printer/print-expr expr)))))
+      (interpreter/interpret expr))))
 
 (defn run-file
   [path]
   ;; The empty Srting array here is necessary so that the
   ;; correct Paths/get method is resolved due to varagrs in
-  ;; the Java method.0
+  ;; the Java method.
   (let [p (java.nio.file.Paths/get path (make-array String 0))
         bytes (java.nio.file.Files/readAllBytes p)]
     (run (String. bytes (java.nio.charset.Charset/defaultCharset)))
-    (when @logger/error?
-      (System/exit 65))))
+    (cond
+      @logger/error? (System/exit 65)
+      @logger/runtime-error? (System/exit 70))))
 
 (defn run-prompt
   []
