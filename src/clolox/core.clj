@@ -1,6 +1,5 @@
 (ns clolox.core
   (:require [clojure.string :as str]
-            [clolox.ast-printer :as printer]
             [clolox.interpreter :as interpreter]
             [clolox.logger :as logger]
             [clolox.parser :as parser]

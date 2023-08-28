@@ -29,6 +29,6 @@
   [e]
   (let [err-msg (format "%s%n[line %s]"
                         (ex-message e)
-                        (-> (ex-data e) :token :token/line))] 
+                        (-> (ex-data e) :token :token/line))]
     (log-error-message err-msg)
     (reset! runtime-error? true)))
