@@ -1,27 +1,32 @@
 (clojure.core/ns clolox.expr)
 
 (clojure.core/defn
-  binary
-  [left-expr operator-token right-expr]
-  #:clolox.expr{:left-expr left-expr,
-                :operator-token operator-token,
-                :right-expr right-expr,
-                :type :binary})
+ binary
+ [left-expr operator-token right-expr]
+ #:clolox.expr{:left-expr left-expr,
+               :operator-token operator-token,
+               :right-expr right-expr,
+               :type :binary})
 
 (clojure.core/defn
-  grouping
-  [expr]
-  #:clolox.expr{:expr expr, :type :grouping})
+ grouping
+ [expr]
+ #:clolox.expr{:expr expr, :type :grouping})
 
 (clojure.core/defn
-  literal
-  [value]
-  #:clolox.expr{:value value, :type :literal})
+ literal
+ [value]
+ #:clolox.expr{:value value, :type :literal})
 
 (clojure.core/defn
-  unary
-  [operator-token right-expr]
-  #:clolox.expr{:operator-token operator-token,
-                :right-expr right-expr,
-                :type :unary})
+ unary
+ [operator-token right-expr]
+ #:clolox.expr{:operator-token operator-token,
+               :right-expr right-expr,
+               :type :unary})
+
+(clojure.core/defn
+ error
+ [message]
+ #:clolox.expr{:message message, :type :error})
 

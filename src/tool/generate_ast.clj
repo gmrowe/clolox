@@ -41,12 +41,18 @@
       (.write w (write-source-as-string basename types))
       (.newLine w))))
 
-(def ast-list
-  ["binary : left-expr operator-token right-expr"
-   "grouping: expr"
-   "literal: value"
-   "unary: operator-token right-expr"
-   "error: message"])
+(def ast-expr-list
+  {:basename "expr"
+   :ast-list  ["binary : left-expr operator-token right-expr"
+               "grouping: expr"
+               "literal: value"
+               "unary: operator-token right-expr"
+               "error: message"]})
+
+(def ast-stmt-list
+  {:basename "stmt"
+   :ast-list  ["expression: expr"
+               "lox-print: expr"]})
 
 (defn print-usage-and-exit
   []
@@ -57,4 +63,5 @@
   [& args]
   (if (not= 1 (count args))
     (print-usage-and-exit)
-    (gen-ast-source (first args) "expr" ast-list)))
+    (doseq [{:keys [basename ast-list]} [ast-expr-list ast-stmt-list]]
+      (gen-ast-source (first args) basename ast-list))))
