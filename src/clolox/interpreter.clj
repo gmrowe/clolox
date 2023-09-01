@@ -4,6 +4,16 @@
             [clolox.logger :as logger]
             [clolox.token :as token]))
 
+(defn stringify
+  [value]
+  (cond
+    (nil? value) "nil"
+    (number? value) (let [s (str value)]
+                      (if (str/ends-with? s ".0")
+                        (subs s 0 (- (count s) 2)) ; truncate the decimal
+                        s))
+    :else (str value)))
+
 (defn lox-eval-error
   [token msg]
   (ex-info
@@ -57,8 +67,8 @@
     (and (number? left) (number? right))
     (+ (double left) (double right))
 
-    (and (string? left) (string? right))
-    (str left right)
+    (or (string? left) (string? right))
+    (str (stringify left) (stringify right))
 
     :else
     (throw
@@ -82,16 +92,6 @@
       ::token/bang-equal (not (= left right))
       ;; Fallthrough
       nil)))
-
-(defn stringify
-  [value]
-  (cond
-    (nil? value) "nil"
-    (number? value) (let [s (str value)]
-                      (if (str/ends-with? s ".0")
-                        (subs s 0 (- (count s) 2)) ; truncate the decimal
-                        s))
-    :else (str value)))
 
 (defn interpret
   [expr]
