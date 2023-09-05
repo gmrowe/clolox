@@ -2,6 +2,7 @@
   (:require [clojure.test :refer [deftest is testing]]
             [clolox.ast-printer :refer :all]
             [clolox.expr :as expr]
+            [clolox.stmt :as stmt]
             [clolox.token :as token]))
 
 (deftest print-expr-test
@@ -23,3 +24,11 @@
           right (expr/grouping (expr/literal 678.90))
           binary (expr/binary left op right)]
       (is (= (print-expr binary) "(* (- 123.45) (group 678.9))")))))
+
+(deftest print-stmt-test
+  (testing "Should represent a printed lox expression"
+    (let [unary (expr/unary
+                 (token/token ::token/minus "-" nil 1)
+                 (expr/literal 123.45))
+          stmt (stmt/lox-print unary)]
+      (is (= (print-stmt stmt) "(lox-print (- 123.45))")))))

@@ -1,6 +1,7 @@
 (ns clolox.ast-printer
   (:require [clojure.string :as str]
-            [clolox.expr :as expr]))
+            [clolox.expr :as expr]
+            [clolox.stmt :as stmt]))
 
 (defmulti print-expr ::expr/type)
 
@@ -33,3 +34,8 @@
 
 
 
+(defmulti print-stmt ::stmt/type)
+
+(defmethod print-stmt :lox-print
+  [expr]
+  (parenthesize "lox-print" (::stmt/expr expr)))

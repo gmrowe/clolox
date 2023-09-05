@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [clolox.expr :as expr]
             [clolox.logger :as logger]
+            [clolox.stmt :as stmt]
             [clolox.token :as token]))
 
 (defn stringify
@@ -32,17 +33,17 @@
     (bin-op left right)
     (throw (lox-eval-error token "Operand must be a number."))))
 
-(defmulti visit ::expr/type)
+(defmulti visit-expr ::expr/type)
 
 (defn evaluate
   [expr]
-  (visit expr))
+  (visit-expr expr))
 
-(defmethod visit :literal
+(defmethod visit-expr :literal
   [expr]
   (::expr/value expr))
 
-(defmethod visit :grouping
+(defmethod visit-expr :grouping
   [expr]
   (evaluate (::expr/expr expr)))
 
@@ -53,7 +54,7 @@
     (boolean? obj) obj
     :else true))
 
-(defmethod visit :unary
+(defmethod visit-expr :unary
   [expr]
   (let [right (evaluate (::expr/right-expr expr))
         token (::expr/operator-token expr)]
@@ -74,7 +75,7 @@
     (throw
      (lox-eval-error token "Operands must be two numbers or two strings."))))
 
-(defmethod visit :binary
+(defmethod visit-expr :binary
   [expr]
   (let [left (evaluate (::expr/left-expr expr))
         right (evaluate (::expr/right-expr expr))
@@ -93,9 +94,26 @@
       ;; Fallthrough
       nil)))
 
+(defmulti visit-stmt ::stmt/type)
+
+(defn execute
+  [stmt]
+  (visit-stmt stmt))
+
+(defmethod visit-stmt :lox-print
+  [stmt]
+  (let [value (evaluate (::stmt/expr stmt))]
+    (println (stringify value))))
+
+(defmethod visit-stmt :expression
+  [stmt]
+  (evaluate (::stmt/expr stmt))
+  nil)
+
 (defn interpret
-  [expr]
-  (try (let [value (evaluate expr)]
-         (println (stringify value)))
+  [stmts]
+  (try (doseq [stmt stmts]
+         (execute stmt))
        (catch Exception e
          (logger/runtime-error! e))))
+

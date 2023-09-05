@@ -1,6 +1,7 @@
 (ns clolox.parser
   (:require [clolox.expr :as expr]
             [clolox.logger :as logger]
+            [clolox.stmt :as stmt]
             [clolox.token :as t]))
 
 (defn parser
@@ -127,6 +128,24 @@
   [psr]
   (equality psr))
 
+(defn print-stmt
+  [psr]
+  (let [[value p] (expression psr)]
+    [(stmt/lox-print value)
+     (consume p ::t/semicolon "Expect ';' after value.")]))
+
+(defn expression-stmt
+  [psr]
+  (let [[value p] (expression psr)]
+    [(stmt/expression value)
+     (consume p ::t/semicolon "Expect ';' after value.")]))
+
+(defn statement
+  [psr]
+  (if (match psr ::t/print)
+    (print-stmt (advance psr))
+    (expression-stmt psr)))
+
 (defn synchronize-point?
   [psr]
   (or (at-end? psr)
@@ -144,10 +163,14 @@
 
 (defn parse
   [psr]
-  (try (first (expression psr))
-       (catch Exception _
-         nil)))
+  (loop [p psr
+         stmts []]
+    (if (at-end? p)
+      stmts
+      (let [[stmt new-p] (statement p)]
+        (recur new-p (conj stmts stmt))))))
 
 (defn parse-tokens
   [tokens]
   (-> tokens parser parse))
+
